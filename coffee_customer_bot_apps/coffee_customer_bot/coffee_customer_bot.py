@@ -46,10 +46,10 @@ class CustomerBot:
             self.test_data['status'] = message.text
 
             if message.text == 'Отмена заказа':
-                requests.post(f"http://127.0.0.1:5000/{variables.server_test_status_endpoint_from_customer}",
+                requests.post(f"{variables.server_domain}/{variables.server_test_status_endpoint_from_customer}",
                               json=self.test_data)
             elif message.text == "Верните бабло":
-                requests.post(f"http://127.0.0.1:5000/{variables.server_test_status_endpoint_from_customer}",
+                requests.post(f"{variables.server_domain}/{variables.server_test_status_endpoint_from_customer}",
                               json=self.test_data)
 
 
