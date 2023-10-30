@@ -18,12 +18,7 @@ class HorecaBot:
         self.token = token if token else config['Bot']['horeca_token']
         self.bot = Bot(token=self.token)
         self.dp = Dispatcher(self.bot, storage=MemoryStorage())
-        self.test_data = {
-            'id': 12365,
-            'id_order': 14,
-            'id_horeca': 12,
-            'status': 'cancel'
-        }
+        self.test_data = {'user_id': 648154559, 'id_horeca': 3, 'id_order': '7fa99e', 'status': 'canceled_by_user'}
 
     def bot_handlers(self):
 
