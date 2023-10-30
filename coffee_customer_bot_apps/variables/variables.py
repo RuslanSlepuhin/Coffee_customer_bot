@@ -14,7 +14,7 @@ provide_message_to_horeca_endpoint = "/provide_message_to_horeca"
 
 main_endpoint = "http://127.0.0.1:5000/is_user_active"
 
+#--------------- server urls ----------------------
 server_test_status_endpoint_from_customer = "/status_from_user/"
 server_test_status_endpoint_from_horeca = "/status_from_horeca/"
-
 server_domain = "https://b8ac-178-124-175-66.ngrok-free.app/client"

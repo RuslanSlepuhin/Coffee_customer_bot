@@ -51,11 +51,11 @@ class HorecaBot:
 
             if message.text == 'Заказ готов':
                 print('send from bot')
-                requests.post(f"{variables.server_domain}/{variables.server_test_status_endpoint_from_horeca}",
+                requests.post(f"{variables.server_domain}{variables.server_test_status_endpoint_from_horeca}",
                               json=self.test_data)
                 print('sent from bot')
             elif message.text == "Заказ протух":
-                requests.post(f"{variables.server_domain}/{variables.server_test_status_endpoint_from_horeca}",
+                requests.post(f"{variables.server_domain}{variables.server_test_status_endpoint_from_horeca}",
                               json=self.test_data)
 
         executor.start_polling(self.dp, skip_updates=True)
