@@ -53,3 +53,11 @@ class CustomerBot:
     async def custom_send_message(self, data):
         user_id = data['user_id']
         await self.bot.send_message(user_id, str(data))
+
+    async def check_subscriber(self, user_id):
+        try:
+            msg = await self.bot.send_message(int(user_id), "Вы можете отслеживать Ваш заказ в этом боте")
+            await msg.delete()
+            return True
+        except:
+            return False

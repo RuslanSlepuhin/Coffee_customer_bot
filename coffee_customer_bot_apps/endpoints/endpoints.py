@@ -3,11 +3,14 @@ import os
 from flask import Flask, request
 from flask_cors import CORS
 
+
 from coffee_customer_bot_apps.variables import variables
 
 class Endpoints:
-    def __init__(self):
+    def __init__(self, horeca_bot, customer_bot):
         self.db_request = None
+        self.horeca_bot = horeca_bot
+        self.customer_bot = customer_bot
 
     def main_endpoints(self, customer_bot, horeca_bot):
         app = Flask(__name__)
@@ -27,9 +30,6 @@ class Endpoints:
         async def provide_message_to_user():
             data = request.json
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-            # loop = asyncio.get_event_loop()
-            # loop.create_task(customer_bot.custom_send_message(data=data))
-            # loop.run_until_complete(customer_bot.custom_send_message(data=data))
             await customer_bot.custom_send_message(data=data)
             return {"response": data}
 
@@ -37,9 +37,6 @@ class Endpoints:
         async def provide_message_to_horeca():
             data = request.json
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-            # loop = asyncio.get_event_loop()
-            # loop.create_task(horeca_bot.custom_send_message(data=data))
-            # loop.run_until_complete(horeca_bot.custom_send_message(data=data))
             await horeca_bot.custom_send_message(data=data)
             return {"response": data}
 
@@ -47,5 +44,19 @@ class Endpoints:
         def impossible_to_cancel_order():
             return {"response": "good"}
 
-        app.run(host='127.0.0.1', port=int(os.environ.get('PORT', 7000)))
+        @app.route(f"{variables.get_subscribe_status}", methods=['GET'])
+        def get_subscribe_status( *args, **kwargs):
+            query = request.args
+            if 'customer_bot' in query:
+                status = asyncio.run(self.customer_bot.check_subscriber(user_id=int(query['user_id'])))
+            elif 'horeca_bot' in query:
+                status = asyncio.run(self.horeca_bot.check_subscriber(user_id=int(query['user_id'])))
+                pass
+            else:
+                return {"error": "You need to provide the one of recipient bots like 'customer_bot' or 'horeca_bot' "}
+            return {"status": status}
+
+
+
+        app.run(host='127.0.0.1', port=int(os.environ.get('PORT', 5000)))
 

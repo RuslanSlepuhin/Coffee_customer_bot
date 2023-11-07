@@ -21,7 +21,7 @@ class BackServer:
             print('1')
             data = request.json
             print('data', data)
-            url = f"http://127.0.0.1:7000{variables.provide_message_to_horeca_endpoint}"
+            url = f"{variables.horeca_bot_domain}{variables.provide_message_to_horeca_endpoint}"
             print(url)
             requests.post(url, json=data)
             return {"response": data}
@@ -31,12 +31,12 @@ class BackServer:
             print('1')
             data = request.json
             print('data', data)
-            url = f"http://127.0.0.1:7000{variables.provide_message_to_user_endpoint}"
+            url = f"{variables.customer_bot_domain}{variables.provide_message_to_user_endpoint}"
             print(url)
             requests.post(url, json=data)
             return {"response": data}
 
-        app.run(host='127.0.0.1', port=int(os.environ.get('PORT', 5000)))
+        app.run(host='127.0.0.1', port=int(os.environ.get('PORT', 7000)))
 
 if __name__ == '__main__':
     ep = BackServer()
