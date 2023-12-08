@@ -5,7 +5,6 @@ from coffee_customer_bot_apps.coffee_horeca_bot.coffee_horeca_bot import HorecaB
 from multiprocessing import Process
 from coffee_customer_bot_apps.endpoints.endpoints import Endpoints
 
-
 config = configparser.ConfigParser()
 config.read('./coffee_customer_bot_apps/settings/config.ini')
 

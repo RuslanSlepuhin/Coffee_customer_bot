@@ -1,0 +1,21 @@
+GET /client/user-info?telegram_user_id=<int>&active=true
+
+telegram_user_id - id пользователя в телеграм
+active - опциональный параметр. Только в случсае значения true эндпоинт возвращает список словарей с заказами, статус которых активный (не закрытый, не отмененный и т.д.)
+
+return <list>
+[
+{
+    0: {'id': 1, 'telegram_user_id': 5884559465, 'enter_key': '44fdg', 'order_id': 'order1', 'status': 'placed', 'bot_subscribing': None, 'telegram_horeca_id': 5884559465, 'horeca_id': 1, 'order_description': 'Ристретто без кофеина с добавлением воды'},
+    1: {'id': 2, 'telegram_user_id': 5884559465, 'enter_key': 'motherfucker02', 'order_id': 'order2', 'status': 'in_progress', 'bot_subscribing': None, 'telegram_horeca_id': 5884559465, 'horeca_id': 2, 'order_description': 'Вино Осеннее с добавлением кофеина. В одарок малосольный огурчик Боря'},
+    ...
+    n: {'id': 3, 'telegram_user_id': 5884559465, 'enter_key': '44fdg', 'order_id': 'order3', 'status': 'ready', 'bot_subscribing': None, 'telegram_horeca_id': 5884559465, 'horeca_id': 1, 'order_description': 'Мокаччино по итальянски. Делает итальянский повар с волосатой грудью'},
+}
+]
+Возвращает список со словарями с указанными ключами и значениями из базы по совпадению telegram_user_id
+_______________________________
+
+POST /client/status_from_user/
+return -> Nothing
+_______________________________
+
