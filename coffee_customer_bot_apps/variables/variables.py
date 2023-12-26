@@ -20,7 +20,9 @@ verification_endpoint = "/client/enter_key_from_user/"
 user_info = "/client/user-info" # GET
 request_exists_user_id = "/user-id-exists/"
 
-get_user_data = "/client/user_info/"
+get_user_info = "/client/user_info" # for customer bot > GET data by customer telegram id
+get_horeca_info = "/client/horeca_info" # for horeca bot -> GET data by horeca telegram id
+
 # -------------- common info --------------
 main_endpoint = "http://127.0.0.1:5000/is_user_active"
 server_domain = "http://127.0.0.1:7000"
@@ -94,8 +96,12 @@ user_data = {
     "status": None,
 }
 user_table_name = "mokka"
-database_user_create_table = f"CREATE TABLE IF NOT EXISTS {user_table_name} " \
+database_user_create_table_Postgres = f"CREATE TABLE IF NOT EXISTS {user_table_name} " \
                              "(id SERIAL PRIMARY KEY, telehram_user_id INT, " \
+                             "verification_code VARCHAR(150), order_id JSONB, " \
+                             "horeca_id JSONB, status JSONB, bot_subscribing BOOL);"
+database_user_create_table_SQLite = f"CREATE TABLE IF NOT EXISTS {user_table_name} " \
+                             "(id INTEGER PRIMARY KEY, telehram_user_id INT, " \
                              "verification_code VARCHAR(150), order_id JSONB, " \
                              "horeca_id JSONB, status JSONB, bot_subscribing BOOL);"
 
@@ -109,3 +115,8 @@ mock_test = [
     "UPDATE mokka SET status='ready' WHERE id=3",
     "UPDATE mokka SET status='delivered' WHERE id=4",
 ]
+
+# ------------------ database -------------------
+use_database = "SQLite" # SQLite or Postgres
+SQLite_path = "./coffee_customer_bot_apps/database/"
+SQLite_name = "coffee.db"

@@ -6,8 +6,8 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.utils import executor
-
 from coffee_customer_bot_apps.variables import variables
+from coffee_customer_bot_apps.coffee_horeca_bot.horeca_add_methods import HorecaBotMethods
 
 config = configparser.ConfigParser()
 config.read("./coffee_customer_bot_apps/settings/config.ini")
@@ -19,23 +19,18 @@ class HorecaBot:
         self.token = token if token else config['Bot']['horeca_token']
         self.bot = Bot(token=self.token)
         self.dp = Dispatcher(self.bot, storage=MemoryStorage())
-        # self.test_data = {} # {'user_id': 648154559, 'id_horeca': 3, 'id_order': '7fa99e', 'status': 'canceled_by_user'}
         self.user_data = {}
         self.messages_list = []
         self.status_number = 0
         self.message = None
+        self.methods = HorecaBotMethods(self)
 
     def bot_handlers(self):
 
-        @self.dp.message_handler(commands=['get_users'])
-        async def get_users(message: types.Message):
-            pass
-
         @self.dp.message_handler(commands=['start'])
         async def start(message: types.Message):
-            await self.get_user_data(message)
             await self.bot.send_message(message.chat.id, f"Your id is {message.chat.id}")
-            await self.change_status(message)
+            await self.methods.start(message)
 
         @self.dp.callback_query_handler()
         async def callbacks(callback: types.CallbackQuery):
@@ -81,35 +76,7 @@ class HorecaBot:
         except:
             return False
 
-    async def change_status(self, message):
-        if self.status_number >= 0:
-            button_value_list = []
-            keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-            key = list(variables.BARISTA_STATUS_CHOICES.keys())[self.status_number]
-            button_value_list.append(KeyboardButton(variables.BARISTA_STATUS_CHOICES[key]))
 
-            if key == "in_progress":
-                button_value_list.append(KeyboardButton(variables.BARISTA_NEGATIVE_STATUS_CHOICES['canceled_by_cafe']))
-            if key == "delivered":
-                button_value_list.append(KeyboardButton(variables.BARISTA_NEGATIVE_STATUS_CHOICES['utilized']))
-
-            keyboard.add(*button_value_list)
-
-            self.message = await self.bot.send_message(message.chat.id, "Изменить статус", reply_markup=keyboard)
-
-            if self.status_number < len(variables.BARISTA_STATUS_CHOICES.keys()) - 1:
-                self.status_number += 1
-            else:
-                self.status_number = -1
-        else:
-            await self.bot.send_message(message.chat.id, f"Заказ №{self.user_data['order_id']} закрыт", reply_markup=ReplyKeyboardRemove())
-
-    async def get_user_data(self, message):
-        if not self.user_data:
-            self.user_data = requests.post(variables.server_domain + variables.get_user_data, json={"telegram_horeca_id": 648154559})
-            self.user_data = json.loads(self.user_data.content.decode('utf-8'))
-
-            pass
 
 
 

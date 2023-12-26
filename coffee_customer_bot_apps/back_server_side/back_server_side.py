@@ -69,7 +69,7 @@ class BackServer:
             else:
                 return jsonify({"error": "unsuccessfully"})
 
-        @app.route("/mock", methods=['GET'])
+        @app.route("/`mock`", methods=['GET'])
         async def mock():
 
             telegram_user_id = request.args.get('telegram_user_id') if 'telegram_user_id' in request.args else None
@@ -81,6 +81,24 @@ class BackServer:
                 self.database.db_execute(query)
 
             return {"response": True}
+
+        @app.route(variables.get_horeca_info, methods=["GET"])
+        def get_horeca_info():
+            response_list = []
+            telegram_user_id = request.args.get('telegram_horeca_id')
+            conditions = f"telegram_horeca_id={int(telegram_user_id)}"
+            if 'active' in request.args:
+                active = request.args.get('active')
+                if active == 'true':
+                    negative_scenario = set(variables.USER_STATUSES_NOT_SHOW.keys())
+                    conditions += f" AND status NOT IN {tuple(negative_scenario)}"
+            match variables.use_database:
+                case "Postgres": response = self.database.select_from("mokka", conditions)
+                case "SQLite": response = self.database.select_from("coffee", conditions)
+            for i in response:
+                response_list.append(from_list_to_dict(variables.fields, i))
+            return jsonify({"response": response_list})
+
 
         def from_list_to_dict(keys, values):
             response_dict = {}

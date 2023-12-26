@@ -8,7 +8,6 @@ from aiogram.utils import executor
 from coffee_customer_bot_apps.variables import variables
 from coffee_customer_bot_apps.coffee_customer_bot.coffee_customer_bot_addit_methods import CustBotAddMethods
 from coffee_customer_bot_apps.coffee_customer_bot.coffee_customer_bot_addit_methods import FormVerificationCode
-# from coffee_customer_bot_apps.database.database_methods import DataBase
 
 config = configparser.ConfigParser()
 config.read("./coffee_customer_bot_apps/settings/config.ini")
@@ -70,7 +69,7 @@ class CustomerBot:
         @self.dp.message_handler(commands=['start'])
         async def start(message: types.Message):
 
-            await self.bot_methods.mock_test(message)
+            # await self.bot_methods.mock_test(message)
 
             await self.bot.delete_message(message.chat.id, message.message_id)
             self.order_index = 0

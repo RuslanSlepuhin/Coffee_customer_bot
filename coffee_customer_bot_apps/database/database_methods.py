@@ -1,27 +1,37 @@
+import sqlite3
+
 import psycopg2
 from coffee_customer_bot_apps.variables import variables
+from coffee_customer_bot_apps.variables.variables import use_database, SQLite_name, SQLite_path, \
+    database_user_create_table_Postgres, database_user_create_table_SQLite
 
 
 class DataBase:
 
     def __init__(self):
-        self.con = None
+        self.con = self.connect()
+        self.db_execute(database_user_create_table_Postgres) if use_database == "Postgres" else self.db_execute(database_user_create_table_SQLite)
 
     def connect(self):
-        self.con = psycopg2.connect(
-            database="coffee_bot",
-            user='ruslan',
-            password='12345',
-            host='localhost',
-            port='5432'
-        )
+        match use_database:
+            case "Postgres":
+                return psycopg2.connect(
+                    database="coffee_bot",
+                    user='ruslan',
+                    password='12345',
+                    host='localhost',
+                    port='5432'
+                )
+            case "SQLite":
+                print(SQLite_path + SQLite_name)
+                return sqlite3.connect(SQLite_path + SQLite_name)
 
     def db_execute(self, query, output_text=None):
-        query = query if query else variables.database_user_create_table
+        query = query if query else variables.database_user_create_table_Postgres
         if not self.con:
-            self.connect()
-        cur = self.con.cursor()
+            self.con = self.connect()
         with self.con:
+            cur = self.con.cursor()
             print(query)
             cur.execute(query)
             print(output_text) if output_text else None
