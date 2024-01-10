@@ -8,12 +8,12 @@ customer_add_username_to_database_endpoint = "https://test.ru"
 # impossible_to_cancel_order_endpoints = "/impossible_to_cancel_order"
 # user_verification_endpoint = "/verification"
 is_user_active_endpoint = "/is_user_active"
-provide_message_to_user_endpoint = "/provide_message_to_user"
+provide_message_to_user_endpoint = "/client/provide_message_to_user"
 provide_message_to_horeca_endpoint = "/provide_message_to_horeca"
 
 #--------------- server urls ---------------
-server_test_status_endpoint_from_customer = "/client/status_from_user/" # take the POST from customer to send to horeca
-server_test_status_endpoint_from_horeca = "/client/status_from_horeca/" # take the POST from horeca to send to customer
+server_status_from_customer = "/client/status_from_user/" # take the POST from customer to send to horeca
+server_status_from_horeca = "/client/status_from_horeca/" # take the POST from horeca to send to customer
 # GET# -> take json from customer with verification code and user_id
 # POST -> {"user_id": user_id:int , "verification_code": verification_code:str}
 verification_endpoint = "/client/enter_key_from_user/"
@@ -66,12 +66,11 @@ USER_STATUSES_CANCEL_IMPOSSIBLE = ['payment_process', 'placed']
 # Выбор статуса заказа
 BARISTA_STATUS_CHOICES = {
     # {'payment_process', 'В процессе оплаты'},
-    # {'placed', 'Размещен - успешно оплачен'},
+    'placed': 'Размещен - успешно оплачен',
     'in_progress': 'В работе - Чек вышел бариста',
     'ready': 'Готов - Заказ готов к передаче',
     'delivered': 'Выдан - получен клиентом',
 }
-
 
 BARISTA_NEGATIVE_STATUS_CHOICES = {
     'utilized': 'Утилизирован - кафе уничтожило заказ, за которым не явились вовремя',
@@ -82,10 +81,8 @@ BARISTA_NEGATIVE_STATUS_CHOICES = {
 complete_statuses = [
     'delivered',
     'utilized',
-    'canceled_by_cafe',
-    'canceled_by_user',
-    'ready',
-    'delivered',
+    # 'canceled_by_cafe',
+    # 'canceled_by_user',
     ]
 
 user_data = {
@@ -95,6 +92,33 @@ user_data = {
     "order_id": None,
     "status": None,
 }
+
+first_short_inline_buttons = {
+    '⏬': 'maximize',
+    'статус  ▶️': 'next_status',
+}
+
+between_short_inline_buttons = {}
+between_short_inline_buttons['◀️ статус'] = 'previous_status'
+between_short_inline_buttons.update(first_short_inline_buttons)
+
+first_extended_inline_buttons = {
+    '⏫': 'minimize',
+    'статус  ▶️': 'next_status',
+}
+between_extended_inline_buttons = {}
+between_extended_inline_buttons['◀️ статус'] = 'previous_status'
+between_extended_inline_buttons.update(first_extended_inline_buttons)
+
+addition_inline_buttons = {
+    '⛔️ отменить': "canceled_by_cafe"
+}
+cancelled_by_cafe_status = 'canceled_by_cafe'
+
+context_menu_list = set(first_extended_inline_buttons.values()).union(set(first_short_inline_buttons.values())).\
+    union(set(between_short_inline_buttons.values())).union(set(between_extended_inline_buttons.values())).\
+    union(set(addition_inline_buttons.values()))
+
 user_table_name = "mokka"
 database_user_create_table_Postgres = f"CREATE TABLE IF NOT EXISTS {user_table_name} " \
                              "(id SERIAL PRIMARY KEY, telehram_user_id INT, " \
@@ -117,6 +141,6 @@ mock_test = [
 ]
 
 # ------------------ database -------------------
-use_database = "SQLite" # SQLite or Postgres
+use_database = "Postgres" # SQLite or Postgres
 SQLite_path = "./coffee_customer_bot_apps/database/"
 SQLite_name = "coffee.db"

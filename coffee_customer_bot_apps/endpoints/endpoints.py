@@ -43,8 +43,10 @@ class Endpoints:
         @app.route(variables.provide_message_to_user_endpoint, methods=['POST'])
         async def provide_message_to_user():
             data = request.json
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-            await customer_bot.custom_send_message(data=data)
+            # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            print('AFTER')
+            await customer_bot.customer_custom_send_message(data=data)
+            print("BEFORE")
             return jsonify({"response": data})
 
         # message to horeca
@@ -52,7 +54,7 @@ class Endpoints:
         async def provide_message_to_horeca():
             data = request.json
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-            await horeca_bot.custom_send_message(data=data)
+            await horeca_bot.horeca_send_message(data=data)
             return jsonify({"response": data})
 
         app.run(host='127.0.0.1', port=int(os.environ.get('PORT', 5000)))

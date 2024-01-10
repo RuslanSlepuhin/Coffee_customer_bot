@@ -1,75 +1,97 @@
-# Customer bot
+Quick start
 
-### *1. Return the user subscriber status*
-- GET ^/subscribe-status?customer_bot&user_id=<user_id>
+You have to use SQLite or PostgreSQL
 
-### *2. Get the order status from horeca throw server*
-- POST ^/provide_message_to_user/
->{ \
-> "user_id": int, \
-> "order_id": str \
-> "horeca_id": str \
-> }
+1) git clone url
+2) cd Coffee_customer_bot
+3) pip install requirements
+4) python -m main
 
-### *3. User verification*
-- POST ^/verification/
->{ \
-> "code": str, \
-> }
+For bot correct working your database must be not empty  
 
-Response:
-> { \
-> "code": str, \
-> "user_id": int \
-> }
+## Horeca bot
+Bot get orders pull and show it in separate messages with buttons when you click 'start'.
 
-How it works
+### <u>Request from horeca bot [GET]:</u> 
+> base url/client/horeca_info?telegram_horeca_id={user_id}&active=true
+###### where user_id - barista telergam_user_id
 
-1. Пользователь платит на сайте и ему предлагается отслеживать заказ в тг боте
-   1. Проверка есть ли в ДБ user_id
-      1. Есть -> Проверяем не заблокирован ли бот \
-      \
-      from backserver 
-      > request \
-      {"request": "is bot blocked"} 
-      
-      > response: \
-      {"is bot blocked": [True or False]}
-
-         1. Заблокирован -> предлагаем перейти в бот и стартовать
-         2. Не заблокирован -> начинаем работу в боте с пользователем
-         3. Нет -> даем ему верификацилонный сгенерированный код и кнопку в бот с инструкциями. Пользователь переходит 
-      в бот, вводит код и начинаем работу в боте с пользователем
-   
-   3. Начинаем работу в боте с пользователем
-      1. Интерфейс пользователя: кноппка отмена с описанием, что отменить можно будет до момента готовности заказа
-      2. Бот получает и отображает изменения статусов. Как только приходит статус Готово, кнопка отменить пропадает
-
-   4. Бот HoReCa
-      1. Кабинет с мультивыбором диалога с пользователями
-      2. 
-
-Логика 
-1) Пользователь на сайте оплачивает кофе:
-   1) Если он уже авторизирован в customer боте, его telegram_user_id есть в базе  
-      Нужно только проверить не заблокировал ли пользователь бота.   
-      Сервер отправляет на эндппоинт get запрос и получает ответ False, если customer бот заблокирован пользователем и True, если пользователь подписан на customer bot  
-      > GET ^/subscribe-status/
-
-      Если True -> кнопка перейти в бота  
-      Если False -> кнопка перейти в бота (вместе со /start)
+Return:
+```
+{
+    "response": [
+        {
+            "bot_subscribing": null,
+            "enter_key": "44fdg",
+            "horeca_id": 1,
+            "id": 1,
+            "order_description": "Ристретто без кофеина с добавлением воды",
+            "order_id": "order1",
+            "status": "placed",
+            "telegram_horeca_id": 5884559465,
+            "telegram_user_id": 5884559465
+        },
+        {
+            "bot_subscribing": null,
+            "enter_key": "motherfucker02",
+            "horeca_id": 2,
+            "id": 2,
+            "order_description": "Вино Осеннее с добавлением кофеина. В одарок малосольный огурчик Боря",
+            "order_id": "order2",
+            "status": "in_progress",
+            "telegram_horeca_id": 5884559465,
+            "telegram_user_id": 5884559465
+        },
+        {
+            "bot_subscribing": null,
+            "enter_key": "44fdg",
+            "horeca_id": 1,
+            "id": 3,
+            "order_description": "Мокаччино по итальянски. Делает итальянский повар с волосатой грудью",
+            "order_id": "order3",
+            "status": "ready",
+            "telegram_horeca_id": 5884559465,
+            "telegram_user_id": 5884559465
+        }
+    ]
+}
+```
 
 
+A barista can to manage each order by status or cancelling it.
+Each action send request to server endpoint to change the order status and server have to provide it to user
 
-   2) Если он не аторизован в боте, то его telegram_user_id нет в базе
-      В таком случае ему генерируется верификационный код и предлагается через кнопку зайти в бот и ввести этот код  
-      Как только ползователь вводит код, из бота отправляется POST запрос на энпоинт
-      > POST ^/enter_key_from_user/  
-      {  
-      "teleram_user_id": int,  
-      "verification_code": str  
-      }
-      
+### <u>Request to change the order status [POST]:</u>
+> base url/client/status_from_horeca/<str:order_id>/
+###### where order_id -> the status updated order id 
+```
+{
+    "bot_subscribing": "None", 
+    "enter_key": "motherfucker02", 
+    "horeca_id": 2, 
+    "id": 2, 
+    "order_description": "Вино Осеннее с добавлением кофеина. В одарок малосольный огурчик Боря", 
+    "order_id": "order2", 
+    "status": "ready", 
+    "telegram_horeca_id": 5884559465, 
+    "telegram_user_id": 5884559465
+    }
+```
 
-Сценарий 1:
-Пользователь нажимает старт, вводит верификационный номер и пара приходит на сервер
+Server sends json with changed status to other side (to the customer bot)
+### <u>Request from the server to the customer bot [POST]:</u>
+> base url/client/provide_message_to_user
+```
+{
+    "bot_subscribing": "None", 
+    "enter_key": "motherfucker02", 
+    "horeca_id": 2, 
+    "id": 2, 
+    "order_description": "Вино Осеннее с добавлением кофеина. В одарок малосольный огурчик Боря", 
+    "order_id": "order2", 
+    "status": "ready", 
+    "telegram_horeca_id": 5884559465, 
+    "telegram_user_id": 5884559465
+    }
+```
+The customer bot shows a notification about changing order status

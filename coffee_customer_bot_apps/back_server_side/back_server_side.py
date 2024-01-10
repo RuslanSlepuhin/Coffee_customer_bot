@@ -7,9 +7,9 @@ from coffee_customer_bot_apps.variables import variables
 import requests
 
 class BackServer:
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self.database = kwargs['database'] if 'database' in kwargs else DataBase()
         self.db_request = None
-        self.database = DataBase()
 
     def main_back_server(self):
         app = Flask(__name__)
@@ -20,8 +20,8 @@ class BackServer:
             return {"message": "site was started"}
 
         # status from USER
-        @app.route(variables.server_test_status_endpoint_from_customer, methods=['POST'])
-        def status_from_customer():
+        @app.route(f"{variables.server_status_from_customer}<order_id>", methods=['PUT'])
+        def status_from_customer(order_id):
             data = request.json
             if self.database.update(data):
                 print('data', data)
@@ -33,9 +33,10 @@ class BackServer:
                 return jsonify({"response": "error"})
 
         # status from HORECA
-        @app.route(variables.server_test_status_endpoint_from_horeca, methods=['POST'])
-        def status_from_horeca():
+        @app.route(f"{variables.server_status_from_horeca}<order_id>/", methods=['PUT'])
+        def status_from_horeca(order_id):
             data = request.json
+            # >>> save to db
             url = f"{variables.customer_bot_domain}{variables.provide_message_to_user_endpoint}"
             requests.post(url, json=data)
             return jsonify({"response": data})

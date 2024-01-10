@@ -32,7 +32,7 @@ class CustBotAddMethods:
             if self.CustomerBot.user_orders:
                 await self.dialog_with_user()
             else:
-                await self.custom_send_message(text=variables.you_have_any_order, keyboard=None)
+                await self.customer_custom_send_message(text=variables.you_have_any_order, keyboard=None)
         else:
             print("Something is wrong")
             await self.bot.send_message(self.message.chat.id, "Something is wrong")
@@ -40,7 +40,7 @@ class CustBotAddMethods:
     async def dialog_with_user(self, user_orders=None, order_index=None):
         self.CustomerBot.user_orders = user_orders if user_orders else self.CustomerBot.user_orders
         if not self.CustomerBot.user_orders:
-            return await self.custom_send_message(text=variables.you_have_any_order, keyboard=None)
+            return await self.customer_custom_send_message(text=variables.you_have_any_order, keyboard=None)
 
         if self.CustomerBot.order_index > len(self.CustomerBot.user_orders) - 1:
             self.CustomerBot.order_index -= 1
@@ -57,7 +57,7 @@ class CustBotAddMethods:
 
         if not keyboard:
             keyboard = ReplyKeyboardRemove()
-        await self.custom_send_message(text=text, keyboard=keyboard)
+        await self.customer_custom_send_message(text=text, keyboard=keyboard)
 
     async def verify_user(self):
         await FormVerificationCode.code.set()
@@ -113,13 +113,13 @@ class CustBotAddMethods:
         order = self.CustomerBot.user_orders[self.CustomerBot.order_index]
         order['status'] = status
         try:
-            requests.post(variables.server_domain + variables.server_test_status_endpoint_from_customer, json=order)
+            requests.post(variables.server_domain + variables.server_status_from_customer, json=order)
             return True
         except Exception as ex:
             print(ex)
             return False
 
-    async def custom_send_message(self, text, keyboard):
+    async def customer_custom_send_message(self, text, keyboard):
         if not self.msg:
             self.msg = await self.bot.send_message(self.message.chat.id, text, reply_markup=keyboard)
         else:

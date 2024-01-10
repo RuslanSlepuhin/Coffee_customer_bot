@@ -94,7 +94,7 @@ class CustomerBot:
 
             if message.text in variables.customer_buttons_status:
                 self.user_data['status'] = variables.customer_buttons_status[message.text]
-                requests.post(f"{variables.server_domain}{variables.server_test_status_endpoint_from_customer}",
+                requests.post(f"{variables.server_domain}{variables.server_status_from_customer}",
                               json=self.user_data)
             else:
                 await self.bot.delete_message(message.chat.id, message.message_id)
@@ -103,7 +103,7 @@ class CustomerBot:
 
         executor.start_polling(self.dp, skip_updates=True)
 
-    async def custom_send_message(self, data):
+    async def customer_custom_send_message(self, data):
         self.user_data = data
         user_id = data['telegram_user_id']
         status_text = str(data)
